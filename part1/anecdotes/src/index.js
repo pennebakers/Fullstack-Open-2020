@@ -3,22 +3,28 @@ import ReactDOM from 'react-dom'
 
 const App = (props) => {
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(new Uint8Array(array))
 
   const handleNextClick = () => {
     var array = props.size
     var random = Math.floor(Math.random() * (array - 0) + 0)
     setSelected(random)
 }
-  const handleVoteClick = (props) => {
-      props.votes[selected] += 1
-  }
+  const handleVoteClick = () => {
+     let copy = [...votes]
+     copy[selected] += 1
+     setVotes(copy)
+}
 
   return (
     <div>
+      <AnecdoteOfTheDay />
       {props.anecdotes[selected]}
-      <p>has {props.votes[selected]} votes</p>
-      <Button onClick={handleVoteClick(selected)} text='Vote'/>
+      <p>has {votes[selected]} votes</p>
+      <Button onClick={handleVoteClick} text='Vote'/>
       <Button onClick={handleNextClick} text='Next'/>
+      <MostVotesTitle />
+      <MostVoted votes={votes} anecdotes={anecdotes}/>
     </div>
   )
 }
@@ -31,8 +37,35 @@ const Button = ({onClick, text}) => {
   )
 }
 
+const MostVotesTitle = () => {
+  return(
+    <h1>anecdotes with most votes</h1>
+  )
+}
 
+const AnecdoteOfTheDay = () => {
+  return(
+    <h1>Anecdote Of The Day</h1>
+  )
+}
 
+const MostVoted = ({votes, anecdotes}) => {
+  const maxIndex = votes.indexOf(Math.max(...votes))
+  const maxVotes = Math.max(...votes)
+  if(maxVotes === 0){
+    return(
+      <h1>no votes have been inputted yet</h1>
+    )
+  }
+
+  return(
+  <div>
+    <p>{anecdotes[maxIndex]}</p>
+    <h1>has {maxVotes} votes</h1>
+  </div>
+  )
+
+}
 
 const anecdotes = [
   'If it hurts, do it more often',
@@ -44,8 +77,7 @@ const anecdotes = [
 ]
 
 var array = anecdotes.length
-
-let votes = Array.apply(null, new Array(10)).map(Number.prototype.valueOf,0);
+var votes = new Uint8Array(array);
 
 ReactDOM.render(
   <App anecdotes={anecdotes} size={array} votes={votes}/>,
